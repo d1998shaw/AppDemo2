@@ -4,7 +4,7 @@ let cors=require("cors");
 
 app.use(express.json());
 const corsOptions={
-    origin:'http://localhost:3000',
+    origin:'https://e8e6-103-211-54-75.ngrok-free.app/',
     Credentials:true,
     optionSuccessStatus:200
 }
