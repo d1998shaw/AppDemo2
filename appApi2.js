@@ -111,8 +111,7 @@ app.post("/shops",function(req,res,next){
         }
         res.send(`insertion successful`);
     });
-});
-app.get("/purchases",function(req,res,next){
+});app.get("/purchases",function(req,res,next){
     console.log("Inside/users get Api");
     let shop=req.query.shop;
     let product=req.query.product;
@@ -157,6 +156,7 @@ app.get("/purchases",function(req,res,next){
 res.send(result.rows);
     });
 });
+
 
 app.put("/product/:editid",function(req,res,next){
     console.log("Inside put of user");
