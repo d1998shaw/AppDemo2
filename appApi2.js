@@ -204,6 +204,7 @@ app.post("/purchases",function(req,res,next){
     });
 });
 
+
 app.get("/totalPurchase/shop/:sid",function(req,res){
     let id=+req.params.sid;
     let value=[id];
@@ -216,8 +217,34 @@ app.get("/totalPurchase/shop/:sid",function(req,res){
                 countMap[productid] = (countMap[productid] || 0) + 1;
                 return countMap;
               }, {});
-              res.send(countById);
-            
+              let arrWithCount = result.rows.map((obj) => {
+                const { productid } = obj;
+                return {
+                  ...obj,
+                  count: countById[productid],
+                };
+              });
+             //to count
+             arrWithCount = arrWithCount.reduce((acc, curr) => {
+                const {purchaseid,shopid, productid, quantity, count,price } = curr;
+                if (!acc[productid]) {
+                    acc[productid] = {
+                       purchaseid:purchaseid,
+                       shopid:shopid,
+                       productid:productid,
+                       quantity: quantity,
+                       price: quantity * price,
+                       count:count
+                    };
+                } else {
+                    acc[productid].quantity += quantity;
+                    acc[productid].price += quantity * price;
+                }
+                return acc;
+            }, []);  
+             res.send(arrWithCount);
+           
+
         }})
 })
 app.get("/total/product/:pid",function(req,res){
@@ -227,12 +254,39 @@ app.get("/total/product/:pid",function(req,res){
             client.query(sql,value,function(err,result){
                 if(err) res.send(err);
                 else{
-                    const countById =result.rows.reduce((countMap, obj) => {
-                        const { productid } = obj;
-                        countMap[productid] = (countMap[productid] || 0) + 1;
+                    const countById = result.rows.reduce((countMap, obj) => {
+                        const { shopid } = obj;
+                        countMap[shopid] = (countMap[shopid] || 0) + 1;
                         return countMap;
                       }, {});
-                      res.send(countById);
-                          }
+                      let arrWithCount = result.rows.map((obj) => {
+                        const { shopid } = obj;
+                        return {
+                          ...obj,
+                          count: countById[shopid],
+                        };
+                      });
+                     //to count
+                     arrWithCount = arrWithCount.reduce((acc, curr) => {
+                        const {purchaseid,shopid, productid, quantity, count,price } = curr;
+                        if (!acc[shopid]) {
+                            acc[shopid] = {
+                               purchaseid:purchaseid,
+                               shopid:shopid,
+                               productid:productid,
+                               quantity: quantity,
+                               price: quantity * price,
+                               count:count
+                            };
+                        } else {
+                            acc[shopid].quantity += quantity;
+                            acc[shopid].price += quantity * price;
+                        }
+                        return acc;
+                    }, []);  
+                     res.send(arrWithCount);
+                   
+        
+                }
             })
         })
