@@ -37,82 +37,6 @@ const client=new Client({
 client.connect(function(res,error){
 console.log(`Connected!!!!`);
 });
-
-app.get("/products",function(req,res){
-    let sql=`SELECT * FROM products2`;
-    client.query(sql,function(err,result1){
-        if(err) res.send("Error in Database",err);
-        else{
-        res.send(result1.rows);
-    } 
-    })
-})
-app.post("/products",function(req,res,next){
-    console.log("Inside post of user");
-    const { productname, category, description } = req.body;
-    var values=[productname,category,description];
-    console.log(values);
-    const query=`INSERT INTO products2(productname,category,description) VALUES($1,$2,$3)`;
-    client.query(query,values,function(err,result){
-        if (err){
-            res.status(400).send(err);
-        }
-        res.send(`insertion successful`);
-    });
-});
-
-app.get("/shops",function(req,res){
-    let sql=`SELECT * FROM shops2`;
-    client.query(sql,function(err,result1){
-        if(err) res.send("Error in Database",err);
-        else{
-        res.send(result1.rows);
-    } 
-    })
-})
-app.get("/shop/:shopid",function(req,res){
-    let id=+req.params.shopid;
-    let value=[id];
-    let sql=`SELECT * FROM purchases2 WHERE shopid=$1`;
-    client.query(sql,value,function(err,result){
-        if(err) res.send(err);
-        else res.send(result.rows);
-    })
-})
-
-app.get("/product/:productid",function(req,res){
-    let id=+req.params.productid;
-    let value=[id];
-    let sql=`SELECT * FROM purchases2 WHERE productid=$1`;
-    client.query(sql,value,function(err,result){
-        if(err) res.send(err);
-        else res.send(result.rows);
-    })
-})
-app.get("/prod/:productid",function(req,res){
-    let id=+req.params.productid;
-    let value=[id];
-    let sql=`SELECT * FROM products2 WHERE productid=$1`;
-    client.query(sql,value,function(err,result){
-        if(err) res.send(err);
-        else res.send(result.rows);
-    })
-})
-
-app.post("/shops",function(req,res,next){
-    console.log("Inside post of user");
-    const {name,rent}=req.body;
-    var values=[name,rent];
-    console.log(values);
-    const query=`INSERT INTO shops2(name,rent) VALUES($1,$2)`;
-    client.query(query,values,function(err,result){
-        if (err){
-            res.status(400).send(err);
-        }
-        res.send(`insertion successful`);
-    });
-});
-
 app.get("/purchases",function(req,res,next){
     console.log("Inside/users get Api");
     let shop=req.query.shop;
@@ -141,14 +65,15 @@ app.get("/purchases",function(req,res,next){
                     if (err) {
                         res.status(500).send("Error in Database: " + err);
                     } else {
-                        let selProd = result1.rows.find(n => n.productname === product);
-                        if (selProd) {
-                            result.rows = result.rows.filter(m => m.productid === selProd.productid);
-                            res.send(result.rows);
-                        } else {
-                            res.send("Product not found");
-                        }
-                    }
+                        let productIds = product
+                        .split(',')
+                        .map(product => product.replace('pr', ''))
+                        .map(product => parseInt(product));
+                    
+                      result1.rows = result1.rows.filter(purchase =>
+                        productIds.includes(purchase.productid)
+                      );
+                     }
                 });
             }
             
@@ -191,7 +116,8 @@ app.put("/product/:editid",function(req,res,next){
 app.post("/purchases",function(req,res,next){
     console.log("Inside post of user");
     const {shopid,productid,quantity,price} = req.body;
-    var values=[shopid,productid,quantity,price];
+    var val
+    ues=[shopid,productid,quantity,price];
     console.log(values);
     const query=`INSERT INTO purchases2(shopid,productid,quantity,price) VALUES($1,$2,$3,$4,$5)`;
     client.query(query,values,function(err,result){
