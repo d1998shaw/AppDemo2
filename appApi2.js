@@ -112,7 +112,6 @@ app.post("/shops",function(req,res,next){
         res.send(`insertion successful`);
     });
 });
-
 app.get("/purchases",function(req,res,next){
     console.log("Inside/users get Api");
     let shop=req.query.shop;
@@ -124,33 +123,19 @@ app.get("/purchases",function(req,res,next){
             console.log(err);
             res.status(400).send(err);}
             if (shop) {
-                let sql = `SELECT * FROM shops2`;
-                client.query(sql,function (err, result1) {
-                    if (err) {
-                        res.status(500).send("Error in Database: " + err);
-                    } else {
-                   let selShop=result1.rows.find((n)=>n.name===shop);
-                   result.rows=result.rows.filter(n=>n.shopid===selShop.shopid);
-                    
-                }
-                });
+                    let id=+shop.slice(2);
+                    console.log("new id",id);
+                    result.rows=result.rows.filter((m)=>m.shopid===id);
+                    console.log("result",result.rows);
             }
              if (product) {
-                let sql = `SELECT * FROM products2`;
-                client.query(sql, function (err, result1) {
-                    if (err) {
-                        res.status(500).send("Error in Database: " + err);
-                    } else {
-                        let productIds = product
-                        .split(',')
-                        .map(product => product.replace('pr', ''))
-                        .map(product => parseInt(product));
+                        let productIds = product.split(',')
+                        .map(pr => pr.replace('pr', ''))
+                        .map(p => parseInt(p));
                     
-                      result1.rows = result1.rows.filter(purchase =>
+                      result.rows = result.rows.filter(purchase =>
                         productIds.includes(purchase.productid)
                       );
-                     }
-                });
             }
             
     if(sort==="QtyAsc"){
