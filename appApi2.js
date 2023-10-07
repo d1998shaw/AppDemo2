@@ -111,7 +111,8 @@ app.post("/shops",function(req,res,next){
         }
         res.send(`insertion successful`);
     });
-});app.get("/purchases",function(req,res,next){
+});
+app.get("/purchases",function(req,res,next){
     console.log("Inside/users get Api");
     let shop=req.query.shop;
     let product=req.query.product;
@@ -163,7 +164,7 @@ app.put("/product/:editid",function(req,res,next){
     let id=+req.params.editid;
     let {productname,category,description}=req.body;
     let values=[productname,category,description,id];
-    const query=`UPDATE products2 SET productname=$1,category=$2,description=$3 WHERE productid=$6`;
+    const query=`UPDATE products2 SET productname=$1,category=$2,description=$3 WHERE productid=$4`;
     client.query(query,values,function(err,result){
         if (err){
             console.log(err);
