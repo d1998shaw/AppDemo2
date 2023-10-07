@@ -4,7 +4,7 @@ let cors=require("cors");
 
 app.use(express.json());
 const corsOptions={
-    origin:'https://0eaf-103-211-54-194.ngrok-free.app',
+    origin:'https://9d80-103-211-54-194.ngrok-free.app',
     Credentials:true,
     optionSuccessStatus:200
 }
